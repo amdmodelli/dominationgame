@@ -1,1 +1,0 @@
-runFlashGUI.cmd pt
