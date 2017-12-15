@@ -15,8 +15,8 @@ public class Cache {
 
     // as this class is only used on j2se and android, we should use proper logging
     static final Logger logger = Logger.getLogger(Cache.class.getName());
-    /*
-     * this is a Costant DEBUG
+    /**
+     * Costant boolean DEBUG
      */
     public static final boolean DEBUG = false;
 

@@ -14,6 +14,7 @@ import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.security.Key;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,9 @@ import java.util.ResourceBundle;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.crypto.Cipher;
+
 import net.yura.domination.engine.ai.AIManager;
 import net.yura.domination.engine.core.Card;
 import net.yura.domination.engine.core.Country;
@@ -81,7 +85,7 @@ public class Risk extends Thread {
 
         RiskGame.setDefaultMapAndCards(b,c);
     }
-    /*
+    /**
      * these are a three types of Level Array's String
      */
     public static final String[] types = new String[] { "human","ai easy","ai easy","ai easy","ai average","ai average" };
@@ -2809,14 +2813,17 @@ public class Risk extends Thread {
     public void newMemoryGame(RiskGame g, String map) {
 
         closeGame();
-
+        
         try {
             // make a copy
 
-            javax.crypto.NullCipher nullCipher = new javax.crypto.NullCipher();
-
-            // @TODO, this will crash on macs
-            game = (RiskGame) (new javax.crypto.SealedObject( g, nullCipher ).getObject( nullCipher ));
+            //javax.crypto.NullCipher nullCipher = new javax.crypto.NullCipher();
+        	
+        	Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding"); //OK
+        	
+			// @TODO, this will crash on macs
+            game = (RiskGame) 
+            		(new javax.crypto.SealedObject( g, chiper ).getObject( chiper ));
             game.loadMap(false, new BufferedReader(new StringReader(map)));
 
             for (int c=1;c<=RiskGame.MAX_PLAYERS;c++) {
