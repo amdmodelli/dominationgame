@@ -33,6 +33,9 @@ import net.yura.domination.engine.translation.TranslationBundle;
 public class RiskGame implements Serializable { // transient
 
 	private static final long serialVersionUID = 8L;
+	/*
+	 * these are a costant 
+	 */
 	public final static String SAVE_VERSION = String.valueOf(serialVersionUID);
 
 	public final static String NETWORK_VERSION = "12";
@@ -2560,7 +2563,7 @@ System.out.print(str+"]\n");
 
 		Vector playersCards = new Vector( currentPlayer.getCards() );
 
-		jumppoint: for (int a=0;a<3;a++) {
+	   for (int a=0;a<3;a++) {
 
 			String name;
 
@@ -2572,11 +2575,11 @@ System.out.print(str+"]\n");
 
 				if (name.equals(Card.WILDCARD) && name.equals( ((Card)playersCards.elementAt(b)).getName() ) ) {
 					c[a] = (Card) playersCards.remove(b);
-					continue jumppoint;
+					continue;
 				}
 				else if ( (Country)((Card)playersCards.elementAt(b)).getCountry() != null && name.equals( ((Country)((Card)playersCards.elementAt(b)).getCountry()).getColor()+"" ) ) {
 					c[a] = (Card) playersCards.remove(b);
-					continue jumppoint;
+					continue;
 				}
 
 			}

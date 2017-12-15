@@ -28,7 +28,9 @@ import net.yura.domination.engine.core.RiskGame;
 import net.yura.domination.engine.translation.MapTranslator;
 
 public class RiskUtil {
-
+	/*
+	 * these are a Costant of Success and Error
+	 */
         public static final Object SUCCESS = "SUCCESS";
         public static final Object ERROR = "ERROR";
 
@@ -422,7 +424,7 @@ public class RiskUtil {
                 }
                 catch(IOException ex) {
                         System.err.println("Error trying to load: "+fileName);
-                        RiskUtil.printStackTrace(ex);
+                        //RiskUtil.printStackTrace(ex);
                         if (c < 5) { // retry
                                 try { Thread.sleep(1000); } catch(Exception ex2) { }
                         }
