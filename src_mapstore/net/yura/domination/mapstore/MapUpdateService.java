@@ -30,7 +30,7 @@ public class MapUpdateService extends Observable {
     static MapUpdateService updateService;
     
     /**
-     * Costant about List for Generics Variabiles
+     * Costant about List for Generics Variabiles applied
      */
     
     public final List<Map> mapsToUpdate = new java.util.Vector();
