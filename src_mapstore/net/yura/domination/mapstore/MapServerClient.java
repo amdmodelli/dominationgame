@@ -69,6 +69,9 @@ public class MapServerClient extends HTTPClient {
     List downloads = new Vector();
 
     class ServerRequest extends Request {
+    	/**
+    	 * Integer Variable
+    	 */
 	public int type;
     }
     
