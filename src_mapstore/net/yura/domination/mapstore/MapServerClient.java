@@ -35,7 +35,7 @@ import net.yura.social.GooglePlusOne;
  */
 public class MapServerClient extends HTTPClient {
 	/**
-	 * Costant about Logger
+	 * Costant about Logger applied
 	 */
     public static final Logger logger = Logger.getLogger(MapServerClient.class.getName());
     /**

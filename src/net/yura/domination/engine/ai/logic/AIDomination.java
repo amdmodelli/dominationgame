@@ -261,137 +261,111 @@ public class AIDomination extends AISubmissive {
 	 */
 	private String findEmptyCountry() {
 		Continent[] cont = game.getContinents();
-        String getPlace;
+
 		double check = -Double.MAX_VALUE;
 		Country toPlace = null;
-		Map<Player, Integer> players = players();
+		Map<Player, Integer> players = new HashMap<Player, Integer>();
+		for (int i = 0; i < this.game.getPlayers().size(); i++) {
+			players.put((Player) this.game.getPlayers().get(i), Integer.valueOf(i));
+		}
+
 		List<Continent> conts = new ArrayList<Continent>(Arrays.asList(cont));
 		Collections.sort(conts, new Comparator<Continent>() {
+
 			@Override
 			public int compare(Continent arg0, Continent arg1) {
 				return (int)Math.signum(getContinentValue(arg1) - getContinentValue(arg0));
 			}
 		});
+
 		for (int i = 0; i < conts.size(); i++) {
 			Continent co = conts.get(i);
+
 			List<Country> ct = co.getTerritoriesContained();
 			int bestCountryScore = 0;
+
+			boolean hasFree = false;
 			Country preferedCountry = null;
 			int[] troops = new int[game.getPlayers().size()];
+
 			boolean hasPlacement = false;
 			Player otherOwner = null;
-
 			for (int j = 0; j < ct.size(); j++) {
 				Country country = ct.get(j);
-
 				if (country.getOwner() == null) {
+					hasFree = true;
 					int countryScore = scoreCountry(country);
-					if (preferedCountry == null || countryScore < bestCountryScore ||
-                            (countryScore == bestCountryScore && r.nextBoolean())) {
+					if (preferedCountry == null || countryScore < bestCountryScore || (countryScore == bestCountryScore && r.nextBoolean())) {
 						bestCountryScore = countryScore;
-                        preferedCountry = country;
+						preferedCountry = country;
 					}
 				} else {
 					Integer index = players.get(country.getOwner());
 					troops[index.intValue()]++;
-					Object[] arrayPlacementOwner = checkPlaceOwner(country.getOwner(),otherOwner);
-					hasPlacement = (boolean)arrayPlacementOwner[0];
-                    otherOwner = (Player)arrayPlacementOwner[1];
+					if (country.getOwner() == player) {
+						hasPlacement = true;
+					} else if (otherOwner == null) {
+						otherOwner = country.getOwner();
+					} else if (otherOwner != country.getOwner() && r.nextBoolean()) {
+						hasPlacement = true; //this is contested
+					}
 				}
 			}
-			getPlace = checkTypePlacement(hasPlacement, preferedCountry);
+
+			if (!hasFree) {
+				continue;
+			}
+
+			if (type == PLAYER_AI_HARD && !hasPlacement) {
+				return getPlaceCommand(preferedCountry, 1);
+			}
+
 			/* Calculate the base value of that continent */
 			double continentValue = getContinentValue(co);
-            Object[] arrayPlace = checkFor(troops,continentValue,bestCountryScore,ct.size(),preferedCountry,check);
-			toPlace = (Country)arrayPlace[0];
-			check = (int)arrayPlace[1];
+
+			for (int j = 0; j < troops.length; j++) {
+				int numberofEnemyUnits = 0;
+				int territorynum = 1;
+				int numberOfEnemies = 0;
+				for (int k = 0; k < troops.length; k++) {
+					if (j == k) {
+						territorynum += troops[k];
+					} else {
+						numberofEnemyUnits += troops[k];
+						if (troops[k] > 0) {
+							numberOfEnemies++;
+						}
+					}
+				}
+
+				double score = territorynum / Math.max(1d, (numberofEnemyUnits * numberOfEnemies));
+				score *= continentValue;
+				score /= bestCountryScore;
+
+				Player p = (Player)game.getPlayers().get(j);
+
+				if (p != this.player) {
+					//always block
+					if (territorynum == ct.size()) {
+						toPlace = preferedCountry;
+						break ;
+					}
+				}
+
+				if (check <= score) {
+					check = score;
+					toPlace = preferedCountry;
+				} else if (toPlace == null) {
+					toPlace = preferedCountry;
+				}
+			}
 		}
-        checkPlace(toPlace);
-		getPlace = getPlaceCommand(toPlace, 1);
-		return getPlace;
+
+		if (toPlace == null) {
+			return "autoplace";
+		}
+		return getPlaceCommand(toPlace, 1);
 	}
-	private Object[] checkPlaceOwner(Player owner, Player otherOwner) {
-	    final int HAS_PLACEMENT = 0;
-	    final int OTHER_OWNER = 1;
-	    Object[] array = new Object[2];
-        if (owner == player || otherOwner != owner && r.nextBoolean()) {
-            array[HAS_PLACEMENT] = true;
-        } else if (otherOwner == null) {
-            array[OTHER_OWNER] = owner;
-        }
-        return array;
-    }
-	private String checkTypePlacement(boolean hasPlacement, Country preferedCountry) {
-	    String s = null;
-        if (type == PLAYER_AI_HARD && !hasPlacement) {
-            s = getPlaceCommand(preferedCountry, 1);
-        }
-        return s;
-    }
-    private HashMap<Player, Integer> players() {
-        HashMap<Player, Integer> players = new HashMap<>();
-        for (int i = 0; i < this.game.getPlayers().size(); i++)
-            players.put((Player) this.game.getPlayers().get(i), Integer.valueOf(i));
-        return players;
-    }
-	private Object[] checkFor(int[] troops, double continentValue,
-                              int bestCountryScore, int ct, Country preferedCountry, double check) {
-        final int TO_PLACE = 0;
-        final int CHECK = 1;
-        Object[] array = new Object[2];
-        for (int j = 0; j < troops.length; j++) {
-            int[] arrayEnemyTerritory = takeEnemyTerritory(troops,j);
-            int numberofEnemyUnits = arrayEnemyTerritory[0];
-            int territorynum = arrayEnemyTerritory[1];
-            int numberOfEnemies = arrayEnemyTerritory[2];
-
-            double score = territorynum / Math.max(1d, (numberofEnemyUnits * numberOfEnemies));
-            score *= continentValue;
-            score /= bestCountryScore;
-
-            Object[] arrayCheckPlace;
-            arrayCheckPlace = checkPlace(preferedCountry, territorynum, ct, score,check);
-            array[TO_PLACE] = arrayCheckPlace[0];
-            array[CHECK] = arrayCheckPlace[1];
-        }
-        return array;
-    }
-    private void checkPlace(Country toPlace) {
-	    if(toPlace == null)
-	        throw new AiDominationException("autoplace");
-    }
-	private int[] takeEnemyTerritory(int[] troops, int j) {
-        final int NUMBER_OF_ENEMY_UNITS = 0;
-        final int TERRITORYNUM = 1;
-        final int NUMBER_OF_ENEMIES = 2;
-        int[] array = new int[3];
-        for (int k = 0; k < troops.length; k++) {
-            if (j == k) {
-                array[TERRITORYNUM] += troops[k];
-            } else {
-                array[NUMBER_OF_ENEMY_UNITS] += troops[k];
-                if (troops[k] > 0) {
-                    array[NUMBER_OF_ENEMIES]++;
-                }
-            }
-        }
-        return array;
-    }
-    private Object[] checkPlace(Country preferedCountry,int territorynum,int ct,double score, double check) {
-	    final int TO_PLACE = 0;
-	    final int CHECK = 1;
-	    Object[] array = new Object[2];
-        if(territorynum == ct)
-            array[TO_PLACE] = preferedCountry;
-
-        if (check <= score) {
-            array[CHECK] = score;
-            array[TO_PLACE] = preferedCountry;
-        } else if (array[TO_PLACE] == null) {
-            array[TO_PLACE] = preferedCountry;
-        }
-        return array;
-    }
 
 	/**
 	 * Gives a score (lower is better) to a country
