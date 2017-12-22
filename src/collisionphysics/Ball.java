@@ -1,16 +1,13 @@
 package collisionphysics;
 
 public class Ball {
-	/*
-	 * Center of ball x and y (Package)
+	/**
+	 * variabiles float for center of ball, x and y
 	 */
    public float x, y;
-   /*
-    * Speed of Ball in x and y
-    */
    float speedX, speedY;
-   /*
-    * Radios of Ball (Package)
+   /**
+    * variabiles type of float of radius
     */
    public float radius;
    
