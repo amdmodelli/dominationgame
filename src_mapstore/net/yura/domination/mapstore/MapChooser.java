@@ -106,7 +106,44 @@ public class MapChooser implements ActionListener,MapServerListener {
             //RiskUtil.printStackTrace(ex);
         }
     }
+    
+    public MapChooser(ActionListener al, java.util.List<String> localMaps, Set<String> allowedMaps) {
+    	this.al = al;
+        this.localMaps = localMaps;
+        this.allowedMaps = allowedMaps;
 
+        try {
+            loader = XULLoader.load( Midlet.getResourceAsStream("/ms_maps.xml") , this, resBundle);
+        }
+        catch(Exception ex) {
+            throw new RuntimeException(ex);
+        }
+        Panel TabBar = (Panel)loader.find("TabBar");
+    }
+    
+    public void MapC()
+    {
+    	if (TabBar != null) {
+
+            int count = 0;
+            if (allowedMaps != null)
+                for (String localMap : localMaps)
+                    if (allowedMaps.contains(localMap))
+                        count++;
+            if (allowedMaps != null && count == allowedMaps.size())
+                TabBar.setVisible(false);
+            else {
+                java.util.List buttons = TabBar.getComponents();
+                Icon on = new Icon("/ms_bar_on.png");
+                Icon off = new Icon("/ms_bar_off.png");
+                int w = off.getIconWidth() / buttons.size();
+                for (int c=0;c<buttons.size();c++) {
+                    RadioButtonMethod();
+                }
+            }
+        }
+    }
+    
     public MapChooser(ActionListener al, java.util.List<String> localMaps, Set<String> allowedMaps) {
         this.al = al;
         this.localMaps = localMaps;
@@ -120,48 +157,42 @@ public class MapChooser implements ActionListener,MapServerListener {
         }
 
         Panel TabBar = (Panel)loader.find("TabBar");
-        if (TabBar != null) {
+        
+        MapC();
+        
+        applied();
+        
+    }
+    
+    /**
+     * Another Method Created tell RadioButtonMethod
+     */
+    
+    public void RadioButtonMethod()
+    {
+    	RadioButton b = (RadioButton)buttons.get(c);
+        Icon oni = on.getSubimage(c*w, 0, w, off.getIconHeight());
+        Icon offi = off.getSubimage(c*w, 0, w, off.getIconHeight());
 
-            int count = 0;
-            if (allowedMaps != null) {
-                for (String localMap : localMaps) {
-                    if (allowedMaps.contains(localMap)) {
-                        count++;
-                    }
-                }
-            }
+        b.setIcon(offi);
+        b.setSelectedIcon(oni);
+        b.setRolloverIcon(offi);
+        b.setRolloverSelectedIcon(oni);
 
-            // if we have all the allowed maps already, no point showing download UI.
-            if (allowedMaps != null && count == allowedMaps.size()) {
-                TabBar.setVisible(false);
-            }
-            else {
-                java.util.List buttons = TabBar.getComponents();
-                Icon on = new Icon("/ms_bar_on.png");
-                Icon off = new Icon("/ms_bar_off.png");
-                int w = off.getIconWidth() / buttons.size();
-                for (int c=0;c<buttons.size();c++) {
-                    RadioButton b = (RadioButton)buttons.get(c);
-                    Icon oni = on.getSubimage(c*w, 0, w, off.getIconHeight());
-                    Icon offi = off.getSubimage(c*w, 0, w, off.getIconHeight());
+        b.setToolTipText( b.getText() );
 
-                    b.setIcon(offi);
-                    b.setSelectedIcon(oni);
-                    b.setRolloverIcon(offi);
-                    b.setRolloverSelectedIcon(oni);
-
-                    b.setToolTipText( b.getText() );
-
-                    b.setText("");
-                    b.setMargin(0);
-                }
-            }
-        }
-
-        list = (List)loader.find("ResultList");
-        if (Midlet.getPlatform() == Midlet.PLATFORM_ME4SE) {
+        b.setText("");
+        b.setMargin(0);
+    }
+    
+    /*
+     * Applied Method applied with a lot of procedures
+     */
+    public void applied()
+    {
+    	list = (List)loader.find("ResultList");
+        if (Midlet.getPlatform() == Midlet.PLATFORM_ME4SE)
             list.setDoubleClick(true);
-        }
         MapRenderer r = new MapRenderer(this);
         list.setCellRenderer( r );
         list.setFixedCellHeight( Math.max( XULLoader.adjustSizeToDensity(100) , r.getFixedCellHeight() ) );
@@ -211,78 +242,84 @@ public class MapChooser implements ActionListener,MapServerListener {
             return false;
         }
     }
+    
+    /**
+     * method
+     */
+    public static void IconGetx()
+    {
+    	String url = getURL(context, iconUrl);
+    	System.out.println("[MapChooser] ### Going to re-encode img: "+url);
+        InputStream min = RiskUtil.openMapStream(url);
+        Image img = MapChooser.createImage(min);
+        img = ImageUtil.scaleImage(img, 150, 94);
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ImageUtil.saveImage(img, out);
+        img = null; // drop the small image as soon as we can
+        byte[] bytes = out.toByteArray();
+        out = null; // drop the OutputStream as soon as we can
+        cache(url,bytes);
+        // TODO we should only cache if we are sure it can be opened as a image
+        in = new ByteArrayInputStream(bytes);
+    }
+    
+    public static void methodAnoth()
+    {
+    	in = repo!=null?repo.get(url):null;
+
+		while (in==null) {
+			try {
+
+				IconGetx();
+
+			}
+			catch (OutOfMemoryError err) { // what can we do?
+					Logger.info("cant resize " + url, err);
+			}
+			catch (Exception ex) {
+				Logger.warn("cant resize " + url, ex);
+			}
+			break;
+    
+    public static void getIconXY()
+    {
+    	aicon = iconCache.newIcon(key);
+
+		String url = getURL(context, iconUrl);
+
+		// if this is a remote file
+		if ( url.indexOf(':')>0 ) getRemoteImage(key, url, c);
+		// if this is a locale file
+		else {
+			InputStream in=null;
+			if (url.startsWith("preview/"))
+				try {
+					in = RiskUtil.openMapStream( url ); // "preview/"+prv
+				}
+			catch (Exception ex) {
+				Logger.warn("cant open " + url, ex);
+			}
+
+			else {
+				//
+				methodAnoth();
+				}
+			}
+
+			if (in!=null)
+				gotImg(key, in);
+    }
 
     /**
      * @param key can be a Map or a Category
      */
-    public static Icon getIconForMapOrCategory(Object key,String context,String iconUrl,MapServerClient c) {
-        Icon aicon = iconCache.get( key );
-        if (aicon==null) {
-            aicon = iconCache.newIcon(key);
-
-            String url = getURL(context, iconUrl);
-
-            // if this is a remote file
-            if ( url.indexOf(':')>0 ) {
-                getRemoteImage(key, url, c);
-            }
-            // if this is a locale file
-            else {
-                InputStream in=null;
-
-                //Map map = (Map)key;
-                //String mapName = map.getMapUrl();
-                //java.util.Map info = RiskUtil.loadInfo(mapName, false);
-                //String prv = (String)info.get("prv");
-                //if (prv!=null) {
-
-                if (url.startsWith("preview/")) {
-                    try {
-                        in = RiskUtil.openMapStream( url ); // "preview/"+prv
-                    }
-                    catch (Exception ex) {
-                        Logger.warn("cant open " + url, ex);
-                    }
-                }
-                //if (in==null) {
-                //    String pic = (String)info.get("pic");
-
-                else {
-
-                    in = repo!=null?repo.get(url):null;
-
-                    while (in==null) {
-                        try {
-                            System.out.println("[MapChooser] ### Going to re-encode img: "+url);
-                            InputStream min = RiskUtil.openMapStream(url);
-                            Image img = MapChooser.createImage(min);
-                            img = ImageUtil.scaleImage(img, 150, 94);
-                            ByteArrayOutputStream out = new ByteArrayOutputStream();
-                            ImageUtil.saveImage(img, out);
-                            img = null; // drop the small image as soon as we can
-                            byte[] bytes = out.toByteArray();
-                            out = null; // drop the OutputStream as soon as we can
-                            cache(url,bytes);
-                            // TODO we should only cache if we are sure it can be opened as a image
-                            in = new ByteArrayInputStream(bytes);
-                        }
-                        catch (OutOfMemoryError err) { // what can we do?
-                            Logger.info("cant resize " + url, err);
-                        }
-                        catch (Exception ex) {
-                            Logger.warn("cant resize " + url, ex);
-                        }
-                        break;
-                    }
-                }
-
-                if (in!=null) {
-                    gotImg(key, in);
-                }
-            }
-
-        }
-        return aicon;
+    public static Icon getIconForMapOrCategory1(Object key,String context,String iconUrl,MapServerClient c) {
+    	Icon aicon = iconCache.get( key );
+    	if (aicon==null) {
+    		getIconXY();
+    		}
+    	}
+    	return aicon;
     }
 
     private static void gotImg(Object obj,InputStream in) {
@@ -416,8 +453,10 @@ public class MapChooser implements ActionListener,MapServerListener {
         client.makeRequestXML( MAP_PAGE , a, b);
     }
 
+    
+    
     public void actionPerformed(String actionCommand) {
-        if ("local".equals(actionCommand)) {
+    	if ("local".equals(actionCommand)) {
             mainCatList(actionCommand);
 
             new Thread() {
@@ -446,115 +485,9 @@ public class MapChooser implements ActionListener,MapServerListener {
                 }
             }.start();
         }
-        else if ("catagories".equals(actionCommand)) {
-            mainCatList(actionCommand);
-
-            client.makeRequestXML( CATEGORIES_PAGE , (String)null, (String)null);
-
-        }
-        else if ("top25".equals(actionCommand)) {
-            mainCatList(actionCommand);
-
-            activateGroup("Top25View");
-        }
-        else if ("search".equals(actionCommand)) {
-            mainCatList(actionCommand);
-
-            actionPerformed("doMapSearch");
-        }
-        else if ("update".equals(actionCommand)) {
-            mainCatList(actionCommand);
-
-            java.util.List<Map> mapsToUpdate = MapUpdateService.getInstance().mapsToUpdate;
-
-            Component updateAll = loader.find("updateAll");
-            while (mapsToUpdate.isEmpty()) {
-                updateAll.setVisible(false);
-                show("AllUpToDate");
-                break;
-            }
-            while (!mapsToUpdate.isEmpty()){
-                updateAll.setVisible(true);
-                setListData( MAP_PAGE , mapsToUpdate);
-                break;
-            }
-        }
-        else if ("updateall".equals(actionCommand)) {
-            java.util.List<Map> mapsToUpdate = MapUpdateService.getInstance().mapsToUpdate;
-            synchronized(mapsToUpdate) {
-                for (int c=0;c<mapsToUpdate.size();c++) {
-                    click(mapsToUpdate.get(c));
-                }
-            }
-        }
-        else if ("TOP_NEW".equals(actionCommand)) {
-            clearList();
-            makeRequestForMap("sort","TOP_NEW" );
-        }
-        else if ("TOP_RATINGS".equals(actionCommand)) {
-            clearList();
-            makeRequestForMap("sort","TOP_RATINGS" );
-        }
-        else if ("TOP_DOWNLOADS".equals(actionCommand)) {
-            clearList();
-            makeRequestForMap("sort","TOP_DOWNLOADS" );
-        }
-        else if ("listSelect".equals(actionCommand)) {
-
-            Object value = list.getSelectedValue();
-            while (value instanceof Category) {
-                Category cat = (Category)value;
-                clearList();
-                makeRequestForMap("category",cat.getId() );
-                break;
-            }
-           while (value instanceof Map) {
-                Map map = (Map)value;
-                click(map);
-                break;
-            }
-            //else value is null coz the list is empty
-        }
-        else if ("sameAuthor".equals(actionCommand)) {
-            Object value = list.getSelectedValue();
-            // TODO
-            // TODO its too hard to get to the right click menu, as you need to hold and wait
-            // TODO does not work for locale maps, as no author id,
-            // TODO does not make sense for categories
-            // TODO
-            while  (value instanceof Map) {
-                Map map = (Map)value;
-                makeRequestForMap("author", map.getAuthorId() );
-                break;
-            }
-        }
-        else if ("defaultMap".equals(actionCommand)) {
-
-            chosenMap( RiskGame.getDefaultMap() );
-
-        }
-        else if ("cancel".equals(actionCommand)) {
-
-            al.actionPerformed(null);
-
-        }
-        else if ("doMapSearch".equals(actionCommand)) {
-            TextComponent.closeNativeEditor();
-            String text = ((TextComponent)loader.find("mapSearchBox")).getText();
-            clearList();
-            while (text != null && !"".equals(text)) {
-                makeRequestForMap("search", text );
-                break;
-            }
-           while (!(text != null && !"".equals(text))){
-                setListData(null, null);
-                break;
-            }
-        }
-        else {
-            System.out.println("Unknown command "+actionCommand);
-        }
     }
+    
+    
 
     public void click(Map map) {
         String fileUID = getFileUID( map.getMapUrl() );
