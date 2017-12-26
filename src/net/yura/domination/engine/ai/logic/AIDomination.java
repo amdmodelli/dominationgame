@@ -2363,6 +2363,17 @@ public class AIDomination extends AISubmissive {
 	 * Will roll the maximum, but checks to see if the attack is still the
 	 * best plan every 3rd roll
 	 */
+	public if_get_roll(){
+		if (n < 3 && game.getBattleRounds() > 0 && (n < m || (n == m && game.getDefender().getOwner().getTerritoriesOwned().size() != 1))) {
+			return "retreat";
+		}
+
+		//spot check the plan
+		if (type != AIDomination.PLAYER_AI_EASY && (game.getBattleRounds()%3 == 2 || (game.getBattleRounds() > 0 && (n - Math.min(m, game.getMaxDefendDice()) <= 0)))) {
+			if_check_plan();
+		}
+	}
+	
 	public if_check_plan(){
 
 		String result = plan(true);
@@ -2382,15 +2393,9 @@ public class AIDomination extends AISubmissive {
 	public String getRoll() {
 		int n=game.getAttacker().getArmies() - 1;
 		int m=game.getDefender().getArmies();
-
-		if (n < 3 && game.getBattleRounds() > 0 && (n < m || (n == m && game.getDefender().getOwner().getTerritoriesOwned().size() != 1))) {
-			return "retreat";
-		}
-
-		//spot check the plan
-		if (type != AIDomination.PLAYER_AI_EASY && (game.getBattleRounds()%3 == 2 || (game.getBattleRounds() > 0 && (n - Math.min(m, game.getMaxDefendDice()) <= 0)))) {
-			if_check_plan();
-		}
+		
+		if_get_roll();
+		
 		return "roll " + Math.min(3, n);
 	}
 
