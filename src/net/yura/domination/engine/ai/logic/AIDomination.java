@@ -2180,24 +2180,26 @@ public class AIDomination extends AISubmissive {
 	/**
 	 * Get an estimate of the remaining troops after taking all possible targets
 	 */
-	private int getMinRemaining(HashMap<Country, AttackTarget> targets, int forwardMin, boolean isBorder, GameState gameState) {
-		int total = 0;
-		for (Iterator<AttackTarget> i = targets.values().iterator(); i.hasNext();) {
-			AttackTarget attackTarget = i.next();
-			if (attackTarget.remaining < 0 && !isBorder) {
-				return 0;
-			}
-			//estimate a cost for the territory
-			total += 1;
-			if (game.getMaxDefendDice() == 2 || attackTarget.targetCountry.getArmies() < 3) {
-				total += attackTarget.targetCountry.getArmies();
-				if (attackTarget.targetCountry.getArmies() < 2) {
-					total += attackTarget.targetCountry.getArmies();
-				}
-			} else {
-				total += 2*attackTarget.targetCountry.getArmies();
-			}
+	private attack_target() {
+
+		AttackTarget attackTarget = i.next();
+		if (attackTarget.remaining < 0 && !isBorder) {
+			return 0;
 		}
+		//estimate a cost for the territory
+		total += 1;
+		if (game.getMaxDefendDice() == 2 || attackTarget.targetCountry.getArmies() < 3) {
+			total += attackTarget.targetCountry.getArmies();
+			if (attackTarget.targetCountry.getArmies() < 2) {
+				total += attackTarget.targetCountry.getArmies();
+			}
+		} else {
+			total += 2*attackTarget.targetCountry.getArmies();
+		}
+	}
+	
+	private if_attack_target() {
+		
 		if (game.getMaxDefendDice() == 2) {
 			forwardMin -= (total *= 1.3);
 		} else {
@@ -2207,6 +2209,15 @@ public class AIDomination extends AISubmissive {
 			//TODO: let the hard player lookahead further, alternatively just call to plan(true) and mark if we are doing an elimination or something
 			return Integer.MAX_VALUE;
 		}
+	}
+	
+	private int getMinRemaining(HashMap<Country, AttackTarget> targets, int forwardMin, boolean isBorder, GameState gameState) {
+		int total = 0;
+		for (Iterator<AttackTarget> i = targets.values().iterator(); i.hasNext();) {
+			attack_target();
+		}
+		    if_attack_target();
+		
 		return Math.max(isBorder?game.getMaxDefendDice():0, forwardMin);
 	}
 
@@ -2352,6 +2363,22 @@ public class AIDomination extends AISubmissive {
 	 * Will roll the maximum, but checks to see if the attack is still the
 	 * best plan every 3rd roll
 	 */
+	public if_check_plan(){
+
+		String result = plan(true);
+		//TODO: rewrite to not use string parsing
+		if (result.equals("endattack")) {
+			return "retreat";
+		}
+		StringTokenizer st = new StringTokenizer(result);
+		st.nextToken();
+		if (game.getAttacker().getColor() != Integer.parseInt(st.nextToken())
+				|| game.getDefender().getColor() != Integer.parseInt(st.nextToken())) {
+			return "retreat";
+		}
+	
+	}
+	
 	public String getRoll() {
 		int n=game.getAttacker().getArmies() - 1;
 		int m=game.getDefender().getArmies();
@@ -2362,17 +2389,7 @@ public class AIDomination extends AISubmissive {
 
 		//spot check the plan
 		if (type != AIDomination.PLAYER_AI_EASY && (game.getBattleRounds()%3 == 2 || (game.getBattleRounds() > 0 && (n - Math.min(m, game.getMaxDefendDice()) <= 0)))) {
-			String result = plan(true);
-			//TODO: rewrite to not use string parsing
-			if (result.equals("endattack")) {
-				return "retreat";
-			}
-			StringTokenizer st = new StringTokenizer(result);
-			st.nextToken();
-			if (game.getAttacker().getColor() != Integer.parseInt(st.nextToken())
-					|| game.getDefender().getColor() != Integer.parseInt(st.nextToken())) {
-				return "retreat";
-			}
+			if_check_plan();
 		}
 		return "roll " + Math.min(3, n);
 	}
