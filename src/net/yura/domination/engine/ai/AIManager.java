@@ -43,9 +43,7 @@ public class AIManager {
             RiskGame game = risk.getGame();
             String output = getOutput(game, game.getCurrentPlayer().getType() );
             try { Thread.sleep(wait); }
-            catch(InterruptedException e) {
-            System.out.println("error");
-            }
+            catch(InterruptedException e) {}
             risk.parser(output);
     }
 

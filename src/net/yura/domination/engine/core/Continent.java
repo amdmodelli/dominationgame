@@ -105,7 +105,8 @@ public class Continent implements Serializable {
 	 * otherwise false if the player does not own the all the territories
 	 */
 	public boolean isOwned(Player p) {
-		for (int c=0; c< territoriesContained.size() ; c++) {
+		int size = territoriesContained.size();
+		for (int c=0; c< size; c++) {
 
 			if ( ((Country)territoriesContained.elementAt(c)).getOwner() != p ) {
 				return false;
@@ -123,8 +124,8 @@ public class Continent implements Serializable {
 	public int getNumberOwned(Player p) {
 
 		int ownedByPlayer=0;
-
-		for (int c=0; c< territoriesContained.size() ; c++) {
+		int size = territoriesContained.size();
+		for (int c=0; c< size; c++) {
 
 			if ( ((Country)territoriesContained.elementAt(c)).getOwner() == p ) {
 				ownedByPlayer++;
@@ -141,7 +142,9 @@ public class Continent implements Serializable {
 	 ****/
 	public Player getOwner(){
 		Player owner = ((Country)territoriesContained.elementAt(0)).getOwner();
-		for (int c=1; c< territoriesContained.size() && owner != null ; c++) {
+		int size = territoriesContained.size();
+		boolean n = owner != null;
+		for (int c=1; c< size && n; c++) {
 			if ( ((Country)territoriesContained.elementAt(c)).getOwner() != owner ) {
 				owner = null;
 			}
@@ -152,10 +155,12 @@ public class Continent implements Serializable {
 	public Vector getBorderCountries() {
 		if (borderCountries == null) {
 			Vector b = new Vector(2);
-			for (int i = 0; i < territoriesContained.size(); i++) {
+			int size2 = territoriesContained.size();
+			for (int i = 0; i < size2; i++) {
 				Country country = (Country) territoriesContained.get(i);
 				Vector w = country.getNeighbours();
-				for (int k = 0; k < w.size(); k++) {
+				int size = w.size();
+				for (int k = 0; k < size; k++) {
 					if (((Country) w.elementAt(k)).getContinent() != this) {
 						/* This is a territory to protect from */
 						b.add(country);

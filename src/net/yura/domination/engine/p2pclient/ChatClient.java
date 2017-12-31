@@ -59,9 +59,7 @@ public class ChatClient implements OnlineRisk {
 
                     chatSocket.close();
             }
-            catch (IOException except) {
-            System.out.println("error");
-            }
+            catch (IOException except) { }
 
             chatSocket = null;
         }

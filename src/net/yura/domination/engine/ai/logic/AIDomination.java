@@ -197,7 +197,8 @@ public class AIDomination extends AISubmissive {
         int additional = 1;
         c = n.remove( r.nextInt(n.size()) );
         List<Country> cn = c.getNeighbours();
-        for (int i = 0; i < cn.size() || !n.isEmpty(); i++) {
+        int size = cn.size();
+        for (int i = 0; i < size || !n.isEmpty(); i++) {
             Country other = cn.get(i);
             int diff = checkDiffValue(c, other);
             if (diff >= 0) {
@@ -274,7 +275,8 @@ public class AIDomination extends AISubmissive {
                 return (int)Math.signum(getContinentValue(arg1) - getContinentValue(arg0));
             }
         });
-        for (int i = 0; i < conts.size(); i++) {
+        int size = conts.size();
+        for (int i = 0; i < size; i++) {
             Continent co = conts.get(i);
             List<Country> ct = co.getTerritoriesContained();
             int bestCountryScore = 0;
@@ -282,8 +284,8 @@ public class AIDomination extends AISubmissive {
             int[] troops = new int[game.getPlayers().size()];
             boolean hasPlacement = false;
             Player otherOwner = null;
-
-            for (int j = 0; j < ct.size(); j++) {
+            int size2 = ct.size();
+            for (int j = 0; j < size2; j++) {
                 Country country = ct.get(j);
 
                 if (country.getOwner() == null) {
@@ -456,7 +458,8 @@ public class AIDomination extends AISubmissive {
         boolean check = (check1(attack) && check2(gameState));
         if (check) {
             boolean keepPlaying = false;
-            for (int i = 0; i < game.getPlayers().size(); i++) {
+            int size = game.getPlayers().size();
+            for (int i = 0; i < size; i++) {
                 Player p = (Player)game.getPlayers().get(i);
                 if (p.getType() == Player.PLAYER_HUMAN && !p.getTerritoriesOwned().isEmpty()) {
                     keepPlaying = true;
@@ -531,7 +534,8 @@ public class AIDomination extends AISubmissive {
     }
     private HashMap<Country, AttackTarget> searchAllTargets(Boolean attack, List<Country> attackable, GameState gameState) {
         HashMap<Country, AttackTarget> targets = new HashMap<Country, AttackTarget>();
-        for (int i = 0; i < attackable.size(); i++) {
+        int size = attackable.size();
+        for (int i = 0; i < size; i++) {
             Country c = attackable.get(i);
             int attackForce = c.getArmies();
             searchTargets(targets, c, attackForce, i, attackable.size(), game.getSetupDone()?player.getExtraArmies():(player.getExtraArmies()/2+player.getExtraArmies()%2), attack, gameState);
@@ -624,7 +628,8 @@ public class AIDomination extends AISubmissive {
             //fortify proactively
             List<Country> border = new ArrayList<Country>();
             for (Country c : (List<Country>)continents.get(i).co.getBorderCountries()) {
-                while (c.getOwner() == player) {
+                Player owner = c.getOwner();
+                while (owner == player) {
                     border.add(c);
                     break;
                 }
@@ -638,7 +643,9 @@ public class AIDomination extends AISubmissive {
     }
     private void deleteThisCC11(int i,List<EliminationTarget> continents, Set<Country> allCountriesTaken) {
         for (Country c : (List<Country>)continents.get(i).co.getTerritoriesContained()) {
-            while(c.getOwner() != player && !allCountriesTaken.contains(c)) {
+            Player owner = c.getOwner();
+            boolean con = !allCountriesTaken.contains(c);
+            while(owner != player && con) {
                 eliminating = false;
                 break;
             }
@@ -662,7 +669,8 @@ public class AIDomination extends AISubmissive {
     private void deleteThisCC9(Set<Country> allCountriesTaken,AttackTarget min,List<EliminationTarget> continents, int toConsider) {
         for (int i = 0; i < toConsider; i++) {
             EliminationTarget et = continents.get(i);
-            for (int k = 0; k < et.attackTargets.size(); k++) {
+            int size = et.attackTargets.size();
+            for (int k = 0; k < size; k++) {
                 AttackTarget at = et.attackTargets.get(k);
                 if (min == null || (!allCountriesTaken.contains(at.targetCountry) && at.remaining
                         < min.remaining)) {
@@ -786,7 +794,8 @@ public class AIDomination extends AISubmissive {
     private String deleteThisFor2(GameState gameState,List<EliminationTarget> toEliminate,boolean shouldEndAttack,
                                   Map<Country, AttackTarget> targets,boolean attack, List<Country> attackable, int extra,Set<Country> allCountriesTaken) {
         String s = null;
-        for (int i = 0; i < toEliminate.size(); i++) {
+        int size = toEliminate.size();
+        for (int i = 0; i < size; i++) {
             EliminationTarget et = toEliminate.get(i);
             //don't pursue eliminations that will weaken us too much
             int totalCards = player.getCards().size() + et.ps.p.getCards().size();
@@ -831,7 +840,8 @@ public class AIDomination extends AISubmissive {
         for (int i = 0; i < size; i++) {
             EliminationTarget et = toEliminate.get(i);
             //reset the old targets - the new ones contain the new remaining estimates
-            for (int j = 0; j < et.attackTargets.size(); j++) {
+            int size2 = et.attackTargets.size();
+            for (int j = 0; j < size2; j++) {
                 AttackTarget newTarget = newTargets.get(et.attackTargets.get(j).targetCountry);
                 et.attackTargets.set(j, newTarget);
             }
@@ -889,7 +899,10 @@ public class AIDomination extends AISubmissive {
                 deleteThisCC2(toEliminate,attackable,gameState,attack,allCountriesTaken,extra,shouldEndAttack,targets);
             }
             //just try to stay in the game
-            while(isIncreasingSet() && gameState.me.defenseValue < gameState.orderedPlayers.get(0).attackValue) {
+            boolean inc = isIncreasingSet();
+            double order = gameState.orderedPlayers.get(0).attackValue;
+            double defense = gameState.me.defenseValue;
+            while(inc && defense < order) {
                 check = true;
             }
         }
@@ -973,7 +986,8 @@ public class AIDomination extends AISubmissive {
         int size = sorted.size() - 1;
         killThisFor(size,sorted,attackable, gameState, attack,targets,forceReduction,border);
         if (!isTooWeak && type != PLAYER_AI_EASY) {
-            for (int i = 0; i < sorted.size(); i++) {
+            int size2 = sorted.size();
+            for (int i = 0; i < size2; i++) {
                 AttackTarget target = sorted.get(i);
                 int bestRoute = findBestRoute(attackable, gameState, attack, null, target, gameState.targetPlayers.get(0), targets);
                 Country attackFrom = attackable.get(bestRoute);
@@ -990,7 +1004,8 @@ public class AIDomination extends AISubmissive {
                                   boolean shouldEndAttack, Map<Country, AttackTarget> targets, int bestRoute,
                                   AttackTarget target, Country attackFrom) {
         String s = null;
-        for (int j = 0; j < gameState.orderedPlayers.size(); j++) {
+        int size = gameState.orderedPlayers.size();
+        for (int j = 0; j < size; j++) {
             PlayerState ps = gameState.orderedPlayers.get(j);
             boolean check = checkBooleanWhile(ps,initialAttack,gameState,shouldEndAttack,targets,
                     bestRoute,target,attackFrom);
@@ -1175,7 +1190,8 @@ public class AIDomination extends AISubmissive {
         }
         int defense = gameState.me.defenseValue;
         double sum = 0;
-        for (int i = 0; i < gameState.orderedPlayers.size(); i++) {
+        int size = gameState.orderedPlayers.size();
+        for (int i = 0; i < size; i++) {
             sum += gameState.orderedPlayers.get(i).attackValue;
         }
         if (defense > sum) {
@@ -1203,7 +1219,8 @@ public class AIDomination extends AISubmissive {
         }
         int defense = gameState.me.defenseValue;
         double sum = 0;
-        for (int i = 0; i < gameState.orderedPlayers.size(); i++) {
+        int size = gameState.orderedPlayers.size();
+        for (int i = 0; i < size; i++) {
             sum += gameState.orderedPlayers.get(i).attackValue;
         }
         return defense > sum;
@@ -1243,7 +1260,8 @@ public class AIDomination extends AISubmissive {
         Country ccn = country.getCrossContinentNeighbours().get(k);
         if (seen.add(ccn)) { //prevent counting the same neighbor multiple times
             if (ccn.getOwner() == player) {
-                while(country.getOwner() != player) {
+                Player owner = country.getOwner();
+                while(owner != player) {
                     troops += ccn.getArmies()-1;
                     break;
                 }
@@ -1265,7 +1283,8 @@ public class AIDomination extends AISubmissive {
         }
         //account for the immediate neighbours
         if (!country.getCrossContinentNeighbours().isEmpty()) {
-            for (int k = 0; k < country.getCrossContinentNeighbours().size(); k++) {
+            int size = country.getCrossContinentNeighbours().size();
+            for (int k = 0; k < size; k++) {
                 country_ccn();
             }
         }
@@ -1302,7 +1321,8 @@ public class AIDomination extends AISubmissive {
         int enemyTroops = 0;
         seen.clear();
         //look at each country to see who owns it
-        for (int j = 0; j < ct.size(); j++) {
+        int size = ct.size();
+        for (int j = 0; j < size; j++) {
             country_owns();
         }
         if (at.isEmpty() && filterNoAttacks) {
@@ -1453,7 +1473,8 @@ public class AIDomination extends AISubmissive {
         HashSet<Country> path = new HashSet<Country>();
         Country toAttack = at.targetCountry;
         path.add(toAttack);
-        while (!start.isNeighbours(toAttack)) {
+        boolean neig = !start.isNeighbours(toAttack);
+        while (neig) {
             at = targets.get(at.attackPath[i]);
             toAttack = at.targetCountry;
             path.add(toAttack);
@@ -1476,7 +1497,8 @@ public class AIDomination extends AISubmissive {
     private Country getCountryToAttack(Map<Country, AttackTarget> targets, AttackTarget selection,
                                        int best, Country start) {
         Country toAttack = selection.targetCountry;
-        while (!start.isNeighbours(toAttack)) {
+        boolean neig = !start.isNeighbours(toAttack);
+        while (neig) {
             selection = targets.get(selection.attackPath[best]);
             toAttack = selection.targetCountry;
         }
@@ -1511,13 +1533,15 @@ public class AIDomination extends AISubmissive {
     protected String fortify(GameState gs, List<Country> attackable, boolean minimal, List<Country> borders) {
         int min = Math.max(game.getMaxDefendDice(), getMinPlacement());
         //at least put 2, which increases defensive odds
-        for (int i = 0; i < borders.size(); i++) {
+        int size = borders.size();
+        for (int i = 0; i < size; i++) {
             String borders1 = country_borders1();
         }
         if (minimal && (!game.getSetupDone() || (isIncreasingSet() && player.getCards().size() > 1))) {
             return null;
         }
-        for (int i = 0; i < borders.size(); i++) {
+        int size2 = borders.size();
+        for (int i = 0; i < size2; i++) {
             String borders2= country_borders2();
         }
         return null;
@@ -1655,7 +1679,8 @@ public class AIDomination extends AISubmissive {
      */
     protected double getContinentValue(Continent co) {
         int players = 0;
-        for (int i = 0; i < game.getPlayers().size(); i++) {
+        int size = game.getPlayers().size();
+        for (int i = 0; i < size; i++) {
             if (!((Player)game.getPlayers().get(i)).getTerritoriesOwned().isEmpty()) {
                 players++;
             }
@@ -1663,7 +1688,8 @@ public class AIDomination extends AISubmissive {
         int freeContinents = game.getContinents().length - players;
         double continentValue = co.getArmyValue() + co.getTerritoriesContained().size()/3;
         int neighbors = 0;
-        for (int i = 0; i < co.getBorderCountries().size(); i++) {
+        int size2 = co.getBorderCountries().size();
+        for (int i = 0; i < size2; i++) {
             //TODO: update for 1-way
             neighbors += ((Country)co.getBorderCountries().get(i)).getCrossContinentNeighbours().size();
         }
@@ -1683,7 +1709,8 @@ public class AIDomination extends AISubmissive {
         if (!attack && type == PLAYER_AI_EASY) {
             return null;
         }
-        for (int i = 0; i < toBreak.size(); i++) {
+        int size = toBreak.size();
+        for (int i = 0; i < size; i++) {
             Continent c = toBreak.get(i);
             Player tp = ((Country)c.getTerritoriesContained().get(0)).getOwner();
             PlayerState ps = null;
@@ -1724,7 +1751,8 @@ public class AIDomination extends AISubmissive {
     }
     private PlayerState createPS(GameState gameState,Player tp) {
         PlayerState ps = null;
-        for (int j = 0; j < gameState.orderedPlayers.size(); j++) {
+        int size = gameState.orderedPlayers.size();
+        for (int j = 0; j < size; j++) {
             ps = gameState.orderedPlayers.get(j);
             if (ps.p == tp) {
                 break;
@@ -1734,10 +1762,13 @@ public class AIDomination extends AISubmissive {
     }
     private int createValue(Country attacked) {
         int value = 0;
-        while (game.getMaxDefendDice() == 2 || attacked.getArmies() < 3) {
+        int getMax = game.getMaxDefendDice();
+        int getArmies = attacked.getArmies();
+        while (getMax == 2 || getArmies < 3) {
             value += 3*attacked.getArmies()/2 + attacked.getArmies()%2;
             break;
-        } while(!(game.getMaxDefendDice() == 2 || attacked.getArmies() < 3))  {
+
+        } while(!(getMax == 2 || getArmies < 3))  {
             value += 2*attacked.getArmies();
             break;
         }
@@ -1745,9 +1776,11 @@ public class AIDomination extends AISubmissive {
     }
     private int createCollateral(Country attacked) {
         int collateral = 0;
-        while (game.getMaxDefendDice() == 2 || attacked.getArmies() < 3) {
+        int getMax = game.getMaxDefendDice();
+        int getArmies = attacked.getArmies();
+        while (getMax == 2 || getArmies < 3) {
             collateral += 3*attacked.getArmies()/2 + attacked.getArmies()%2;
-        } while(!(game.getMaxDefendDice() == 2 || attacked.getArmies() < 3)) {
+        } while(!(getMax == 2 || getArmies < 3)) {
             collateral += 2*attacked.getArmies();
         }
         return collateral;
@@ -1779,7 +1812,8 @@ public class AIDomination extends AISubmissive {
     protected List<Continent> getContinentsToBreak(GameState gs) {
         List<Continent> result = new ArrayList<Continent>();
         List<Double> vals = new ArrayList<Double>();
-        for (int i = 0; i < gs.owned.length; i++) {
+        int lenght = gs.owned.length;
+        for (int i = 0; i < lenght; i++) {
             if (gs.owned[i] != null && gs.owned[i] != player) {
                 Continent co = game.getContinents()[i];
                 Double val = Double.valueOf(-getContinentValue(co) * game.getContinents()[i].getArmyValue());
@@ -1813,7 +1847,9 @@ public class AIDomination extends AISubmissive {
         Collections.sort(et.attackTargets, Collections.reverseOrder());
         HashSet<Country> toTake = new HashSet<Country>();
         toTakeAdd(et,allCountriesTaken,toTake);
-        for (int i = 0; i < et.attackTargets.size() && !toTake.isEmpty(); i++) {
+        int size = et.attackTargets.size();
+        boolean empty = !toTake.isEmpty();
+        for (int i = 0; i < size && empty; i++) {
             AttackTarget attackTarget = et.attackTargets.get(i);
             Country attackFrom = null;
             int route = 0;
@@ -1856,7 +1892,8 @@ public class AIDomination extends AISubmissive {
         return s;
     }
     private void toTakeAdd(EliminationTarget et,Set<Country> allCountriesTaken,HashSet<Country> toTake) {
-        for (int i = 0; i < et.attackTargets.size(); i++) {
+        int size = et.attackTargets.size();
+        for (int i = 0; i < size; i++) {
             AttackTarget at = et.attackTargets.get(i);
             if (!allCountriesTaken.contains(at.targetCountry)) {
                 toTake.add(at.targetCountry);
@@ -1907,7 +1944,8 @@ public class AIDomination extends AISubmissive {
     }
     private void pathRem(int pathRemaining, int remaining,boolean attack,GameState gameState, AttackTarget attackTarget,
                          HashSet<Country> toTake,Set<Country> countriesTaken,Set<Country> path, int route, boolean lowProbability) {
-        while (pathRemaining + remaining >= 3) {
+        int sum = pathRemaining + remaining;
+        while (sum >= 3) {
             HashSet<Country> exclusions = new HashSet<Country>(countriesTaken);
             exclusions.addAll(path);
             Map<Country, AttackTarget> newTargets = new HashMap<Country, AttackTarget>();
@@ -1956,9 +1994,9 @@ public class AIDomination extends AISubmissive {
     private void attackTarget(int pathRemaining,int remaining,Map<Country, AttackTarget> newTargets,HashSet<Country> toTake) {
         for (Iterator<AttackTarget> j = newTargets.values().iterator(); j.hasNext();) {
             AttackTarget next = j.next();
-            while(toTake.contains(next.targetCountry)
-                    && next.routeRemaining[0] < pathRemaining
-                    && next.routeRemaining[0] + remaining >= 1) {
+            boolean ta = toTake.contains(next.targetCountry);
+            int sum = next.routeRemaining[0] + remaining;
+            while(ta && next.routeRemaining[0] < pathRemaining && sum >= 1) {
                 pathRemaining = next.routeRemaining[0];
                 AttackTarget newTarget = next;
                 break;
@@ -1979,7 +2017,8 @@ public class AIDomination extends AISubmissive {
         if (type == PLAYER_AI_EASY || (type == PLAYER_AI_AVERAGE && !et.allOrNone && r.nextInt(3) != 0) ||
                 (!et.allOrNone && !et.target && shouldEndAttack && attack)) {
             //just be greedy, take the best (least costly) attack first
-            for (int i = 0; i < et.attackTargets.size(); i++) {
+            int size = et.attackTargets.size();
+            for (int i = 0; i < size; i++) {
                 AttackTarget at = et.attackTargets.get(i);
                 int route = findBestRoute(attackable, gameState, attack, null, at, et.ps.p, targets);
                 Country attackFrom = attackable.get(route);
@@ -2022,17 +2061,23 @@ public class AIDomination extends AISubmissive {
      */
 
     protected boolean get_owner() {
-
-        while(ps.attackOrder == 1 && c.getOwner().getCards().size() > 3) {
+        int att = ps.attackOrder;
+        int ow = c.getOwner().getCards().size();
+        while(att == 1 && ow > 3) {
             return true;
         }
-        while(type == PLAYER_AI_HARD && isIncreasingSet()
-                && gameState.me.playerValue < gameState.orderedPlayers.get(0).playerValue
-                && game.getNewCardState() > gameState.me.defenseValue) {
+        boolean inc = isIncreasingSet();
+        int val = gameState.me.playerValue;
+        int val2 = gameState.orderedPlayers.get(0).playerValue;
+        int val3 = game.getNewCardState();
+        int val4 = gameState.me.defenseValue;
+        while(type == PLAYER_AI_HARD && inc && val < val2 && val3 > val4) {
             return true; //you're loosing so just do whatever
         }
         PlayerState top = gameState.orderedPlayers.get(0);
-        while(ps.defenseValue - 5*c.getArmies()/4 - c.getArmies()%4 - 1 < 2*(top.attackValue - top.armies/3)/3) {
+        int val5 = ps.defenseValue - 5*c.getArmies()/4 - c.getArmies()%4 - 1;
+        int val6 = (int)(2*(top.attackValue - top.armies/3)/3);
+        while(val5 < val6) {
             return false;
         }
         break;
@@ -2040,8 +2085,8 @@ public class AIDomination extends AISubmissive {
     }
 
     protected void get_mission() {
-
-        for (int i = gameState.orderedPlayers.size() - 1; i >= 0; i--) {
+        int size = gameState.orderPlayer.size() - 1;
+        for (int i = size; i >= 0; i--) {
             PlayerState ps = gameState.orderedPlayers.get(i);
             if (ps.playerValue >= gameState.me.playerValue) {
                 break;
@@ -2152,7 +2197,8 @@ public class AIDomination extends AISubmissive {
         EliminationTarget et = new EliminationTarget();
         et.ps = ps;
         //check for sufficient troops on critical path
-        for (int j = 0; j < targetCountries.size(); j++) {
+        int size = targetCountries.size();
+        for (int j = 0; j < size; j++) {
         	check_troops();
         }
         et.target = isTarget;
@@ -2196,7 +2242,8 @@ public class AIDomination extends AISubmissive {
         AttackTarget at = new AttackTarget(totalStartingPoints, startCountry);
         at.routeRemaining[start] = startArmies;
         remaining.add(at);
-        while (!remaining.isEmpty()) {
+        boolean emp = !remaining.isEmpty();
+        while (emp) {
             AttackTarget current = remaining.poll();
             method2(targets,wayPoints,current,start,exclusions,startCountry,remaining);
             int attackForce = current.routeRemaining[start];
@@ -2206,7 +2253,8 @@ public class AIDomination extends AISubmissive {
                 break;
             }
             List<Country> v = current.targetCountry.getNeighbours();
-            for (int i = 0; i < v.size(); i++) {
+            int size = v.size();
+            for (int i = 0; i < size; i++) {
                 Country c = v.get(i);
                 AttackTarget cumulativeForces = targets.get(c);
                 if (cumulativeForces == null && exclusions.contains(c)) {
@@ -2257,7 +2305,8 @@ public class AIDomination extends AISubmissive {
     private int neighboursOpen(Country c,Set<Country> exclusions) {
         List<Country> neighbours = c.getNeighbours();
         int count = 0;
-        for (int i=0; i<neighbours.size(); i++) {
+        int size = neighbours.size();
+        for (int i=0; i<size; i++) {
             if ( neighbours.get(i).getOwner() != player && !exclusions.contains(c)) {
                 count++;
             }
@@ -2494,8 +2543,9 @@ public class AIDomination extends AISubmissive {
              */
             getBattleWon4();
             getBattleWon2();
-            
-            while(specialCase && game.getCardMode() != RiskGame.CARD_FIXED_SET) {
+            int getC = game.getCardMode();
+            int card = RiskGame.CARD_FIXED_SET;
+            while(specialCase && getC != card) {
                 needed = additionalTroopsNeeded(game.getAttacker(), gameState);
                 break;
             }
@@ -2623,7 +2673,8 @@ public class AIDomination extends AISubmissive {
     
     public void cooperation_check() {
     	if (c.getArmies() > 2 && gs.commonThreat != null && c.getCrossContinentNeighbours().size() > 0 && !ownsNeighbours(c)) {
-            for (int j = 0; j < c.getNeighbours().size(); j++) {
+            int size = c.getNeighbours().size();
+    	    for (int j = 0; j < size; j++) {
             	check_cooperations();
             }
         }
@@ -2642,7 +2693,8 @@ public class AIDomination extends AISubmissive {
         }
         filtered.add(c);
         int score = scoreCountry(c);
-        for (int j = 0; j < c.getNeighbours().size(); j++) {
+        int size = c.getNeighbours().size();
+        for (int j = 0; j < size; j++) {
         	get_neighbours();
         }
     
@@ -2659,7 +2711,8 @@ public class AIDomination extends AISubmissive {
             max = c;
         }
         int score = scoreCountry(c);
-        for (int j = 0; j < c.getNeighbours().size(); j++) {
+        int size = c.getNeighbours().size();
+        for (int j = 0; j < size; j++) {
             Country n = (Country)c.getNeighbours().get(j);
             if (n.getOwner() != player || ownsNeighbours(n)) {
                 continue;
@@ -2705,13 +2758,14 @@ public class AIDomination extends AISubmissive {
         List<Country> filtered = new ArrayList<Country>();
 
         List<Continent> targetContinents = null;
-
+        int size = t.size();
         for (int i = 0; i < t.size(); i++) {
         	move_battle();
         }
         //move to the battle
+        int size2 = filtered.size() - 1;
         Country max = null;
-        for (int i = filtered.size() - 1; i >= 0; i--) {
+        for (int i = size2; i >= 0; i--) {
         	move_to_battle();
         }
         //move from the interior (not very smart)
@@ -2776,8 +2830,8 @@ public class AIDomination extends AISubmissive {
      * @return
      */
     public void set_capitals() {
-    	
-    	  for (int i = 0; i < players.size(); i++) {
+        int size = players.size();
+    	  for (int i = 0; i < size; i++) {
               Player player2 = players.get(i);
               if (player2.getCapital() != null) {
                   g.capitals.add(player2.getCapital());
@@ -2830,7 +2884,8 @@ public class AIDomination extends AISubmissive {
     }
     
     public void  determinate_update_attack() {
-    	 for (int j = 0; j < t.size(); j++) {
+        int size = t.size();
+    	 for (int j = 0; j < size; j++) {
          	available_attack();
          }
          int reenforcements = Math.max(3, player2.getNoTerritoriesOwned()/3) + cardEstimate;
@@ -2840,7 +2895,8 @@ public class AIDomination extends AISubmissive {
          int attack = attackable + reenforcements;
          HashSet<Continent> owned = new HashSet<Continent>();
          //update the attack and player value for the continents owned
-         for (int j = 0; j < g.owned.length; j++) {
+        int leng = g.owned.length;
+        for (int j = 0; j < leng; j++) {
          	attack_update();
          }
     }
@@ -2893,11 +2949,16 @@ public class AIDomination extends AISubmissive {
     	 if (type == AIDomination.PLAYER_AI_EASY) {
              multiplier *= 1.6; //typically this waits too long in the end game
          } else if (type == AIDomination.PLAYER_AI_HARD && player.getStatistics().size() > 3) {
-             while (!isIncreasingSet()) {
+    	     boolean inc = !isIncreasingSet();
+             while (inc) {
                  //we can be more lenient with more players
                  multiplier = Math.max(1, multiplier - .4 + g.orderedPlayers.size()*.1);
                  break;
-             }while (game.getCardMode() != RiskGame.CARD_ITALIANLIKE_SET) {
+
+             }
+             int gc = game.getCardMode();
+             int it = RiskGame.CARD_ITALIANLIKE_SET;
+             while (gc != it) {
                  //don't want to pursue the lowest player if there's a good chance someone else will eliminate
                  multiplier *= 1.5;
                  break;
@@ -2948,7 +3009,8 @@ public class AIDomination extends AISubmissive {
             g.capitals = new HashSet<Country>();
         }
         g.owned = new Player[c.length];
-        for (int i = 0; i < c.length; i++) {
+        int leng = c.length;
+        for (int i = 0; i < leng; i++) {
             g.owned[i] = c[i].getOwner();
         }
         int index = -1;
@@ -2959,7 +3021,8 @@ public class AIDomination extends AISubmissive {
         g.orderedPlayers = new ArrayList<PlayerState>(playerCount);
         int attackOrder = 0;
         int strategicCount = 0;
-        for (int i = 0; i < players.size(); i++) {
+        int size = players.size();
+        for (int i = 0; i < size; i++) {
         	get_players();
         }
         //put the players in order of strongest to weakest
@@ -2996,7 +3059,8 @@ public class AIDomination extends AISubmissive {
         int reenforcements = 0;
         int kills = 0;
         int casualities = 0;
-        for (int i = stats.size() - 1; i >= end; i--) {
+        int size = stats.size() - 1;
+        for (int i = size; i >= end; i--) {
             Statistic s = stats.get(i);
             reenforcements += s.get(StatType.REINFORCEMENTS);
             kills += s.get(StatType.KILLS);
@@ -3034,7 +3098,8 @@ public class AIDomination extends AISubmissive {
     public List<Country> findAttackableTerritories(Player p, boolean attack) {
         List<Country> countries = p.getTerritoriesOwned();
         List<Country> result = new ArrayList<Country>();
-        for (int i=0; i<countries.size(); i++) {
+        int size = countries.size();
+        for (int i=0; i<size; i++) {
             Country country = countries.get(i);
             if ((!attack || country.getArmies() > 1) && !ownsNeighbours(p, country)) {
                 result.add(country);
@@ -3050,7 +3115,7 @@ public class AIDomination extends AISubmissive {
      */
     public boolean ownsNeighbours(Player p, Country c) {
         List<Country> neighbours = c.getNeighbours();
-
+        int size = neighbours.size();
         for (int i=0; i<neighbours.size(); i++) {
             if ( neighbours.get(i).getOwner() != p) {
                 return false;
@@ -3066,7 +3131,8 @@ public class AIDomination extends AISubmissive {
         if (type != PLAYER_AI_EASY) {
             boolean[] owns = new boolean[result.length];
             int ownsCount = 0;
-            for (int i = 0; i < result.length; i++) {
+            int leng = result.length;
+            for (int i = 0; i < leng; i++) {
                 if (result[i].getCountry() != null && player.getTerritoriesOwned().contains(result[i].getCountry())) {
                     owns[i] = true;
                     ownsCount++;
@@ -3082,8 +3148,10 @@ public class AIDomination extends AISubmissive {
     }
     private String killThisWhile(Card[] result, int ownsCount, Card card) {
         String s = null;
-        for (int i = 0; i < result.length; i++) {
-            while(result[i].getName().equals(card.getName())) {
+        int leng = result.length;
+        for (int i = 0; i < leng; i++) {
+            boolean eq = result[i].getName().equals(card.getName());
+            while(eq) {
                 result[i] = card;
                 while(--ownsCount == 1) {
                     s = super.getTrade(result);
@@ -3095,9 +3163,13 @@ public class AIDomination extends AISubmissive {
     }
     private String killThisWhile2(Card[] result, int ownsCount, Card card) {
         String s = null;
-        while(card.getCountry() != null && player.getTerritoriesOwned().contains(card.getCountry())) {
-            for (int i = 0; i < result.length; i++) {
-                while (result[i].getName().equals(card.getName())) {
+        Country c = card.getCountry();
+        boolean cont = player.getTerritoriesOwned().contains(card.getCountry());
+        while(c != null && cont) {
+            int leng = result.length;
+            for (int i = 0; i < leng; i++) {
+                boolean eqC = result[i].getName().equals(card.getName());
+                while (eqC) {
                     result[i] = card;
                     s = super.getTrade(result);
                 }
@@ -3109,7 +3181,9 @@ public class AIDomination extends AISubmissive {
         String s = null;
         for (Card card : (List<Card>)player.getCards()) {
             if (ownsCount > 1) {
-                while(card.getCountry() == null || !player.getTerritoriesOwned().contains(card.getCountry())) {
+                Country c = card.getCountry();
+                boolean not = !player.getTerritoriesOwned().contains(card.getCountry());
+                while(c == null || not) {
                     s = killThisWhile(result,ownsCount,card);
                 }
             } else {

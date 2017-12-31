@@ -23,8 +23,7 @@ public class BadgeButton extends RadioButton implements Observer {
         try {
             border = DesktopPane.getDefaultTheme("Badge").getBorder(Style.ALL);
         }
-        catch (Exception ex) {System.out.println("error");
-        }
+        catch (Exception ex) { }
 
         setHorizontalAlignment(Graphics.HCENTER);
     }
