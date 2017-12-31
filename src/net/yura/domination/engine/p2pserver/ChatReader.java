@@ -37,7 +37,7 @@ public class ChatReader extends Thread{
 		}
 	}
 	catch (IOException e) {
-
+System.out.println("error");
 		//System.out.println("ChatReader IOException: "+
 		//    e.getMessage());
 		//RiskUtil.printStackTrace(e);

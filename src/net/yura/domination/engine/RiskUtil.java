@@ -193,7 +193,9 @@ public class RiskUtil {
             try {
                  prefs = Preferences.userNodeForPackage( uiclass );
             }
-            catch(Throwable th) { } // security
+            catch(Throwable th) {
+            System.out.println("error");
+            } // security
             final Preferences theprefs = prefs;
             return new Properties() {
                 public String getProperty(String key) {
@@ -224,7 +226,9 @@ public class RiskUtil {
             try {
                  prefs = Preferences.userNodeForPackage( uiclass );
             }
-            catch(Throwable th) { } // security
+            catch(Throwable th) {
+            System.out.println("error");
+            } // security
 
             if (prefs!=null) {
 
@@ -271,7 +275,9 @@ public class RiskUtil {
             try {
                  prefs = Preferences.userNodeForPackage( uiclass );
             }
-            catch(Throwable th) { } // security
+            catch(Throwable th) {
+            System.out.println("error");
+            } // security
 
             if (prefs!=null) {
 
@@ -524,10 +530,12 @@ public class RiskUtil {
                         break;
                 }
                 catch(IOException ex) {
-                        System.err.println("Error trying to load: "+fileName);
+                        System.out.println("Error trying to load: "+fileName);
                         //RiskUtil.printStackTrace(ex);
                         if (c < 5) { // retry
-                                try { Thread.sleep(1000); } catch(Exception ex2) { }
+                                try { Thread.sleep(1000); } catch(InterruptedException ex2) {
+                                System.out.println("error");
+                                }
                         }
                         else { // give up
                                 break;
@@ -535,7 +543,9 @@ public class RiskUtil {
                 }
                 finally {
                     if (bufferin!=null) {
-                        try { bufferin.close(); } catch(Exception ex2) { }
+                        try { bufferin.close(); } catch(Exception ex2) { 
+                        System.out.println("error");
+                        }
                     }
                 }
             }

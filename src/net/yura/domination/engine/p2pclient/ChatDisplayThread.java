@@ -44,7 +44,7 @@ public class ChatDisplayThread extends Thread {
 	    //RiskUtil.printStackTrace(e);
 
 	    //if ("Stream closed".equals( e.getMessage() ) ) { badexit=false; }
-
+System.out.println("error");
        }
 
 	//System.out.println("Display Thread Finishing");

@@ -43,6 +43,7 @@ public class ChatArea extends Thread {
             }
         }
         catch (IOException e) {
+            System.out.println("error");
         }
         gui.sendMessage("no one can join now",false,false);
     }
@@ -67,6 +68,7 @@ public class ChatArea extends Thread {
             try {
                 serverSocket.close();
             } catch (IOException e) {
+                System.out.println("error");
             }
         }
     }
@@ -105,6 +107,7 @@ public class ChatArea extends Thread {
                     if (str.length() == 0)
                         wait();
                 } catch (InterruptedException e) {
+                    System.out.println("error");
                 }
                 if (stopFlag)
                     return null;

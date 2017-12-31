@@ -108,6 +108,7 @@ public class ChatServerThread extends Thread {
 
 		}
 		catch (IOException e) {
+                    System.out.println("error");
                        //System.out.println("ChatServerThread IOException: "+
                        //e.getMessage());
                        //RiskUtil.printStackTrace(e);
