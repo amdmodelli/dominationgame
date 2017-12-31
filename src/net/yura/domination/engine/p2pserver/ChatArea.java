@@ -96,7 +96,8 @@ public class ChatArea extends Thread {
     }
     // called to wait for any new messages for a given thread
     String waitForString(int index) {
-        String str;
+        String str = null;
+        int leng = str.length();
         synchronized(this) {
             do {
                 str = getStrings(index);
@@ -111,7 +112,8 @@ public class ChatArea extends Thread {
                 }
                 if (stopFlag)
                     return null;
-            } while (str.length() == 0);
+                leng = str.length();
+            } while (leng == 0);
             return str;
         }
     }
