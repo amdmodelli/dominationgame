@@ -90,8 +90,7 @@ public class Cache {
     }
     private void checkCacheDir() {
         if (!cacheDir.mkdirs()) {
-            boolean dir = !cacheDir.isDirectory();
-            while (dir) {
+            while (!cacheDir.isDirectory()) {
                 throw new RuntimeException("can not make cache dir: "+cacheDir);
             }
         }

@@ -88,8 +88,8 @@ public class AICapital extends AIDomination {
 				
 				mapEntryMethod();
 				
-				int size = gameState.orderedPlayers.size();
-				for (int j = 0; j < size; j++) {
+				
+				for (int j = 0; j < gameState.orderedPlayers.size(); j++) {
 
 					gameState();
 				}
@@ -163,8 +163,7 @@ public class AICapital extends AIDomination {
 		if (ps.p == other) {
 			if (gameState.commonThreat == null && gameState.orderedPlayers.size() > 1 && ps.attackValue > (ps.strategic?3:4)*primaryDefense) {
 				gameState.commonThreat = ps;
-				boolean che = !gameState.targetPlayers.contains(ps.p);
-				while(che) {
+				while(!gameState.targetPlayers.contains(ps.p)) {
 					gameState.targetPlayers.add(ps.p);
 					break;
 				}
@@ -309,8 +308,7 @@ public class AICapital extends AIDomination {
 		int score = Integer.MAX_VALUE;
 		Country result = null;
 		List<Country> v = player.getTerritoriesOwned();
-		int size = v.size();
-		for (int i = 0; i < size; i++) {
+		for (int i = 0; i < v.size(); i++) {
 			Country c = v.get(i);
 			int val = scoreCountry(c);
 			val -= c.getArmies()/game.getPlayers().size();

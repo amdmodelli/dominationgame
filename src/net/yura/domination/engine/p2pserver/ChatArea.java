@@ -43,6 +43,7 @@ public class ChatArea extends Thread {
             }
         }
         catch (IOException e) {
+            System.out.println("error");
         }
         gui.sendMessage("no one can join now",false,false);
     }
@@ -57,7 +58,7 @@ public class ChatArea extends Thread {
         return serverSocket.isClosed();
     }
     // Add a new string to all linked lists
-    void putString(int index, String s) {
+     void putString(int index, String s) {
         synchronized(this) {
             for (int i = 0; i < chatArr.length; i++)
                 if (chatArr[i] != null)
@@ -67,6 +68,7 @@ public class ChatArea extends Thread {
             try {
                 serverSocket.close();
             } catch (IOException e) {
+                System.out.println("error");
             }
         }
     }
@@ -94,12 +96,10 @@ public class ChatArea extends Thread {
     }
     // called to wait for any new messages for a given thread
     String waitForString(int index) {
-        String str = null;
-        int leng = str.length();
+        String str;
         synchronized(this) {
             do {
                 str = getStrings(index);
-
                 synchronized(str) {
                     if (str == null) return null;
                 }
@@ -107,11 +107,11 @@ public class ChatArea extends Thread {
                     if (str.length() == 0)
                         wait();
                 } catch (InterruptedException e) {
+                    System.out.println("error");
                 }
                 if (stopFlag)
                     return null;
-                leng = str.length();
-            } while (leng == 0);
+            } while (str.length() == 0);
             return str;
         }
     }

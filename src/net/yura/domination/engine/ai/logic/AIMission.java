@@ -46,8 +46,7 @@ public class AIMission extends AIDomination {
 		int result = super.scoreCountry(country);
 		if (player.getMission().getPlayer() != null && !isTargetMoot()) {
 			List<Country> n = country.getNeighbours();
-			int size = n.size();
-			for (int i = 0; i < size; i++) {
+			for (int i = 0; i < n.size(); i++) {
 				Country nc = n.get(i);
 				if (nc.getOwner() == player.getMission().getPlayer()) {
 					result--;

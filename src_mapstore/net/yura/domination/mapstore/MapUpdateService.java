@@ -58,12 +58,12 @@ public class MapUpdateService extends Observable {
     public void init(List mapsUIDs,String url) {
         
         List gotMaps = getMaps(url, mapsUIDs);
-        int size = mapsUIDs.size();
-        for (int c=0;c<size;c++) {
+        
+        for (int c=0;c<mapsUIDs.size();c++) {
             String uid = (String)mapsUIDs.get(c);
             List theMaps = new ArrayList(1);
-            int size2 = gotMaps.size();
-            for (int i=0;i<size2;i++) {
+
+            for (int i=0;i<gotMaps.size();i++) {
                 Map themap = (Map)gotMaps.get(i);
                 String mapUID = MapChooser.getFileUID( themap.getMapUrl() );
                 if (mapUID.equals( uid )) { // we found the map
@@ -90,8 +90,8 @@ public class MapUpdateService extends Observable {
     public static List getMaps(String url,List mapsUIDs) {
     
         StringBuffer payload=new StringBuffer();
-        int size = mapsUIDs.size();
-        for (int c=0;c<size;c++) {
+        
+        for (int c=0;c<mapsUIDs.size();c++) {
             String uid = (String)mapsUIDs.get(c);
             if (payload.length()!=0) {
                 payload.append('&');
@@ -131,8 +131,7 @@ logger.fine("URL: " + url + " payload: " + payload);
     }
 
     private int getIndexOfMap(String mapUID) {
-        int size = mapsToUpdate.size();
-        for (int c = 0; c < size; c++) {
+        for (int c = 0; c < mapsToUpdate.size(); c++) {
             Map map = (Map) mapsToUpdate.get(c);
             String amapUID = MapChooser.getFileUID(map.getMapUrl());
             if (mapUID.equals(amapUID)) {
