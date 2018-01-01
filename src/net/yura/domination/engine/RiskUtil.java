@@ -27,6 +27,11 @@ import net.yura.domination.engine.core.Player;
 import net.yura.domination.engine.core.RiskGame;
 import net.yura.domination.engine.translation.MapTranslator;
 
+/**
+ * RiskUtil Class
+ * @author Il23
+ *
+ */
 public class RiskUtil {
     /**
      * these are a Costant of Success and Error

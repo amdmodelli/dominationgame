@@ -10,9 +10,11 @@ import java.io.IOException;
  * @author Yura Mamyrin
  */
 
-// The ChatReader thread reads incomming socket data and puts it into the
-// Chat Area so that all outbound threads can send it out
-
+/**
+ * the chatReader thread reads incoming socket data and puts it
+ * @author Il23
+ *
+ */
 public class ChatReader extends Thread{
     BufferedReader mySocketInput;
     int myIndex;

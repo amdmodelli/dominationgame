@@ -12,8 +12,13 @@ import net.yura.domination.engine.Risk;
  */
 
 
-// This thread reads in input stream from a socket and
-// appends the output to a TextArea object
+
+
+/**
+ * This thread reads in input stream from a socket
+ * @author Il23
+ *
+ */
 
 public class ChatDisplayThread extends Thread {
     Risk risk;

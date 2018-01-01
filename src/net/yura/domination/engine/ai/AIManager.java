@@ -7,6 +7,11 @@ import net.yura.domination.engine.Risk;
 import net.yura.domination.engine.core.RiskGame;
 import net.yura.util.Service;
 
+/**
+ * Class AIManager
+ * @author Il23
+ *
+ */
 public class AIManager {
 
     private static int wait=500;
