@@ -577,14 +577,17 @@ public class RiskUtil {
         // as this could be dir=.../maps fileName=preview/file.jpg
         // we need to make sure the preview dir exists, and if it does not, we must make it
         File parent = outFile.getParentFile();
+        OutputStream oS = null;
         if (!parent.isDirectory() && !parent.mkdirs()) { // if it does not exist and i cant make it
             try {
             
             } catch (RuntimeException runtimeException) {
+                oS = new FileOutputStream(outFile);
                 System.err.println("can not create dir " + parent);
             }
         }
-        return new FileOutputStream( outFile );
+
+        return oS;
     }
 
     public static void rename(File oldFile,File newFile) {

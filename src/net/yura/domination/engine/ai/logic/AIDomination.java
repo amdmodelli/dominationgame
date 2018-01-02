@@ -1264,7 +1264,8 @@ public class AIDomination extends AISubmissive {
         Country ccn = country.getCrossContinentNeighbours().get(k);
         if (seen.add(ccn)) { //prevent counting the same neighbor multiple times
             if (ccn.getOwner() == player) {
-                while(country.getOwner() != player) {
+                Player gOw = country.getOwner();
+                while(gOw != player) {
                     troops += ccn.getArmies()-1;
                     break;
                 }
@@ -2072,8 +2073,9 @@ public class AIDomination extends AISubmissive {
      */
 
     protected boolean get_owner() {
-
-        while(ps.attackOrder == 1 && c.getOwner().getCards().size() > 3) {
+        int size = c.getOwner().getCards().size();
+        int p = ps.attackOrder;
+        while(p == 1 && size > 3) {
             return true;
         }
         boolean isInc = isIncreasingSet();
@@ -2688,8 +2690,10 @@ public class AIDomination extends AISubmissive {
     }
     
     public void cooperation_check() {
+
     	if (c.getArmies() > 2 && gs.commonThreat != null && c.getCrossContinentNeighbours().size() > 0 && !ownsNeighbours(c)) {
-            for (int j = 0; j < c.getNeighbours().size(); j++) {
+    	    int size = c.getNeighbours().size();
+            for (int j = 0; j < size; j++) {
             	check_cooperations();
             }
         }
