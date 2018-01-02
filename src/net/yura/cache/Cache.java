@@ -2,6 +2,7 @@ package net.yura.cache;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.URLEncoder;
@@ -34,7 +35,7 @@ public class Cache {
         for (;;) {
             if (dir.exists()) {
                 if (!dir.isDirectory() || !dir.canWrite()) {
-                    throw new RuntimeException("can not write to dir: "+dir);
+                    System.err.println("can not write to dir: "+dir);
                 }
                 if (DEBUG) logger.info("can write to: "+dir);
                 break;
@@ -51,8 +52,9 @@ public class Cache {
             return new File(cacheDir, fileName);
         }
         catch (Exception ex) {
-            throw new RuntimeException(ex);
+             System.err.println("RuntimeException");
         }
+        return null;
     }
 
     public void put(String key, byte[] value) {
@@ -92,7 +94,7 @@ public class Cache {
         if (!cacheDir.mkdirs()) {
             boolean cach = !cacheDir.isDirectory();
             while (cach) {
-                throw new RuntimeException("can not make cache dir: "+cacheDir);
+                System.err.println("can not make cache dir: "+cacheDir);
             }
         }
     }
@@ -105,8 +107,8 @@ public class Cache {
                 file.setLastModified(System.currentTimeMillis());
                 return new FileInputStream(file);
             }
-            catch (Exception ex) {
-                throw new RuntimeException(ex);
+            catch (FileNotFoundException ex) {
+                System.err.println("RuntimeException(ex)");
             }
         }
         else {

@@ -73,8 +73,8 @@ public class RiskUtil {
         try {
             settings.load(RiskUtil.class.getResourceAsStream("settings.ini"));
         }
-        catch (Exception ex) {
-            throw new RuntimeException("can not find settings.ini file!",ex);
+        catch (IOException ex) {
+            System.out.println("can not find settings.ini file!");
         }
 
         RISK_VERSION_URL = settings.getProperty("VERSION_URL");
@@ -578,14 +578,22 @@ public class RiskUtil {
         // we need to make sure the preview dir exists, and if it does not, we must make it
         File parent = outFile.getParentFile();
         if (!parent.isDirectory() && !parent.mkdirs()) { // if it does not exist and i cant make it
-            throw new RuntimeException("can not create dir "+parent);
+            try {
+            
+            } catch (RuntimeException runtimeException) {
+                System.err.println("can not create dir " + parent);
+            }
         }
         return new FileOutputStream( outFile );
     }
 
     public static void rename(File oldFile,File newFile) {
         if (newFile.exists() && !newFile.delete()) {
-            throw new RuntimeException("can not del dest file: "+newFile);
+            try {
+            
+            } catch (RuntimeException runtimeException) {
+                System.err.println("can not del dest file: " + newFile);
+            }
         }
         if (!oldFile.renameTo(newFile)) {
             try {
@@ -596,7 +604,11 @@ public class RiskUtil {
                 }
             }
             catch(Exception ex) {
-                throw new RuntimeException("rename failed: from: "+oldFile+" to: "+newFile,ex);
+                try {
+                   
+                } catch (RuntimeException runtimeException) {
+                    System.err.println("rename failed: from: " + oldFile + " to: " + newFile);
+                }
             }
         }
     }
