@@ -807,43 +807,6 @@ public class AIDomination extends AISubmissive {
     protected boolean isIncreasingSet() {
         return game.getCardMode() == RiskGame.CARD_INCREASING_SET && (type != PLAYER_AI_HARD || game.getNewCardState() > 12) && (!game.getCards().isEmpty() || game.isRecycleCards());
     }
-
-    private String peepholeBreak(Country attackFrom,List<Country> border,Country initialAttack,
-                                 GameState gameState,AttackTarget target,Map<Country, AttackTarget> targets,int bestRoute) {
-        String s = null;
-        boolean check = check7(attackFrom,border,initialAttack)
-                && (check8(gameState,initialAttack) || check9(gameState,initialAttack,attackFrom,border) ||
-                check10(attackFrom, target));
-        if (check) {
-            s = getAttack(targets, target, bestRoute, attackFrom);
-        }
-        if (gameState.commonThreat != null && gameState.commonThreat.p == initialAttack.getContinent().getOwner() && target.remaining >= -(attackFrom.getArmies()/2 + attackFrom.getArmies()%2)) {
-            s = getAttack(targets, target, bestRoute, attackFrom);
-        }
-        return s;
-    }
-    private boolean check7(Country attackFrom,List<Country> border,Country initialAttack) {
-        boolean check = (attackFrom.getCrossContinentNeighbours().size() == 1 || !border.contains(attackFrom))
-                && attackFrom.getCrossContinentNeighbours().contains(initialAttack);
-        return check;
-    }
-    private boolean check8(GameState gameState, Country initialAttack) {
-        boolean check = (gameState.commonThreat != null && gameState.commonThreat.p == initialAttack.getOwner()) ||
-                gameState.targetPlayers.contains(initialAttack.getOwner());
-        return check;
-    }
-    private boolean check9(GameState gameState, Country initialAttack, Country attackFrom,List<Country> border) {
-        boolean check = ((gameState.commonThreat == null && !gameState.breakOnlyTargets))
-                && initialAttack.getContinent().getOwner() != null
-                && (!border.contains(attackFrom) || initialAttack.getArmies() == 1);
-        return check;
-    }
-    private boolean check10(Country attackFrom, AttackTarget target) {
-        boolean check =
-                (attackFrom.getArmies() > 3)
-                        && target.remaining >= -(attackFrom.getArmies()/2 + attackFrom.getArmies()%2);
-        return check;
-    }
     /**
      * Quick check to see if we're significantly weaker than the strongest player
      */
@@ -1486,13 +1449,6 @@ public class AIDomination extends AISubmissive {
         }
         return collateral;
     }
-    private int createCost(List<Country> borders,Country attackFrom) {
-        int cost = 0;
-        if (borders.contains(attackFrom)) {
-            cost += game.getMaxDefendDice();
-        }
-        return cost;
-    }
     /**
      * Get a list of continents to break in priority order
      */
@@ -1754,26 +1710,6 @@ public class AIDomination extends AISubmissive {
         }
         break;
 
-    }
-
-    protected void get_mission() {
-        int size = gameState.orderedPlayers.size() - 1;
-        for (int i = size; i >= 0; i--) {
-            PlayerState ps = gameState.orderedPlayers.get(i);
-            if (ps.playerValue >= gameState.me.playerValue) {
-                break;
-            }
-            if (ps.p == c.getOwner()) {
-                boolean owner= get_owner();
-            }
-        }
-    }
-
-    protected void player_mission() {
-
-        if (player.getMission() != null || ((attack|| isIncreasingSet()) && (c.getOwner().getCards().size() > 1 || (c.getOwner().getCards().size() == 1 && game.getCards().isEmpty())))) {
-            get_mission();
-        }
     }
 
     protected boolean ps_R_Cou(GameState gUb, Map<Country, AttackTarget> zN, int route, AttackTarget uG, Country fgr, EliminationTarget et, boolean v) {
@@ -2565,18 +2501,6 @@ public class AIDomination extends AISubmissive {
          for (int j = 0; j < leng; j++) {
          	attack_update();
          }
-    }
-    
-    public void small_multiplayer() {
-    	ps.defenseValue = 5*noArmies/4 + noArmies%4 + player2.getNoTerritoriesOwned();
-        ps.p = player2;
-        if (i == 0) {
-            g.me = ps;
-        } else {
-            g.orderedPlayers.add(ps);
-        }
-        ps.playerValue += ps.attackValue + ((game.getMaxDefendDice() == 2 && !isIncreasingSet())?1:game.getMaxDefendDice()>2?3:2)*ps.defenseValue;
-        attackOrder++;
     }
     
     public void get_players() {
